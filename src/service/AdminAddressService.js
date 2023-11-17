@@ -1,7 +1,7 @@
 import { ResponseError } from "../error/ResponseError.js"
 import Address from "../models/AdminAddress.Models.js"
 import Admin from "../models/AdminModels.js"
-import { addAddressAdminValidate } from "../validation/AdminAddressValidation.js"
+import { addAddressAdminValidate, updateAddressAdminValidate } from "../validation/AdminAddressValidation.js"
 
 
 export const addAdminAddressService = async (request, adminId) => {
@@ -45,5 +45,30 @@ export const getAdminAddress = async (adminId) => {
 
     return admin
 
+}
 
+export const uupdateAdminAddress = async (request, adminId) => {
+    const result = await updateAddressAdminValidate.validateAsync(request)
+
+    const admin = await Address.findOne({
+        where: {
+            id_admin: adminId
+        }
+    })
+
+    if (!admin){
+        throw new ResponseError(404, 'Data not found')
+    }
+
+    await Address.update({
+        street: result.street,
+        city: result.city,
+        postal_code: result.postal_code
+    }, {
+        where: {
+            id_admin: adminId
+        }
+    })
+
+    return result
 }

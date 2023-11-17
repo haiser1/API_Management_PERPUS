@@ -16,3 +16,9 @@ export const loginAdminValidate = Joi.object({
 export const updateAdminValidate = Joi.object({
     name: Joi.string().max(100).optional()
 })
+
+export const changeAdminPasswordValidate = Joi.object({
+    password: Joi.string().max(255).required(),
+    new_password: Joi.string().max(255).required(),
+    confirm_password: Joi.string().max(255).valid(Joi.ref('new_password')).required()
+})

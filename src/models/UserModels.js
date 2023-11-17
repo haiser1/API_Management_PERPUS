@@ -7,6 +7,7 @@ const Users = db.define('users', {
     nim: {
         type: DataTypes.STRING(15),
         allowNull: false,
+        unique: true,
         validate: {
             notEmpty: true
         }
@@ -24,7 +25,8 @@ const Users = db.define('users', {
         validate: {
             isEmail: true,
             notEmpty: true
-        }
+        },
+        unique: true
     },
     class: {
         type: DataTypes.STRING(100),
@@ -39,10 +41,6 @@ const Users = db.define('users', {
         validate: {
             notEmpty: true
         }
-    },
-    refreshToken: {
-        type: DataTypes.TEXT,
-        allowNull: true
     },
     role: {
         type: DataTypes.ENUM('users'),

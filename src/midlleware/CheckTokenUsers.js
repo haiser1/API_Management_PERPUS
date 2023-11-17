@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 
 const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH, 'utf-8')
 
-export const checkTokenAdmin = async (req, res, next) => {
+export const checkTokenUsers = async (req, res, next) => {
     const { authorization } = req.headers
 
     if (!authorization) return res.status(401).json({message: 'Unauthorized'})
@@ -15,11 +15,11 @@ export const checkTokenAdmin = async (req, res, next) => {
     jwt.verify(token, publicKey, (err, decoded) => {
         if (err) return res.status(401).json({message: 'Token error'})
 
-        req.adminId = decoded.id
-        req.adminName = decoded.name
+        req.userId = decoded.id
+        req.userName = decoded.name
         req.role = decoded.role
 
-        if (req.role !== 'admin') return res.status(403).json({message: 'Akses denied'})
+        if (req.role !== 'users') return res.status(403).json({message: 'Akses denied'})
 
         next()
     })

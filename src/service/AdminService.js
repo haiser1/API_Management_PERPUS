@@ -1,11 +1,12 @@
 import { ResponseError } from "../error/ResponseError.js"
 import Admin from "../models/AdminModels.js"
-import { loginAdminValidate, registerAdminValidate, updateAdminValidate } from "../validation/AdminValidation.js"
+import { changeAdminPasswordValidate, loginAdminValidate, registerAdminValidate, updateAdminValidate } from "../validation/AdminValidation.js"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import fs from 'fs'
 
 const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH, 'utf-8')
+const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH, 'utf-8')
 
 export const registerAdminService = async (request) => {
     const result = await registerAdminValidate.validateAsync(request)
@@ -50,14 +51,12 @@ export const loginAdminService = async (request) => {
         throw new ResponseError(400, 'Email or password wrong')
     }
 
-    const adminId = admin.id
-    const adminName = admin.name
-    const role = admin.role
-    const accessToken = jwt.sign({adminId, adminName, role}, privateKey, {
+    const {id, name, role} = admin
+    const accessToken = jwt.sign({id, name, role}, privateKey, {
         expiresIn: '60s',
         algorithm: 'RS256'
     })
-    const refreshToken = jwt.sign({adminId, adminName, role}, privateKey, {
+    const refreshToken = jwt.sign({id, name, role}, privateKey, {
         expiresIn: '12h',
         algorithm: 'RS256'
     })
@@ -66,7 +65,7 @@ export const loginAdminService = async (request) => {
         refreshToken: refreshToken
     }, {
         where: {
-            id: adminId
+            id: id
         }
     })
 
@@ -113,26 +112,44 @@ export const updateAdminService = async (request, adminId) => {
     return result
 }
 
+export const changeAdminPassword = async (request, adminId) => {
+    const result = await changeAdminPasswordValidate.validateAsync(request)
+    const admin = await Admin.findOne({
+        where: {
+            id: adminId
+        }
+    })
+
+    if (!admin){
+        throw new ResponseError(404, 'Data not found')
+    }
+
+    const match = await bcrypt.compare(result.password, admin.password)
+
+    if (!match){
+        throw new ResponseError(400, 'Password wrong')
+    }
+
+    const hashPassword = await bcrypt.hash(result.new_password, 10)
+    await Admin.update({
+        password: hashPassword
+    }, {
+        where: {
+            id: adminId
+        }
+    })
+}
+
 export const logoutAdminService = async (token) => {
     if (!token){
         throw new ResponseError(401, 'Unauthorized')
     }
 
-    const admin = await Admin.findOne({
-        where: {
-            refreshToken: token
+    jwt.verify(token, publicKey, (err, decoded) => {
+        if (err){
+            throw new ResponseError(401, 'Token error')
         }
+        return
     })
-
-    if (!admin){
-        throw new ResponseError(401, 'Unauthorized')
-    }
-
-    await Admin.update({
-        refreshToken: null
-    }, {
-        where: {
-            id: admin.id
-        }
-    })
+    
 }

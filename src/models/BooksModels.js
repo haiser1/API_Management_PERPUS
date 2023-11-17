@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize"
 import db from "../config/Database.js"
 import Admin from "./AdminModels.js"
+import Category from "./CategoryModels.js"
 
 
 const Books = db.define('books', {
@@ -40,15 +41,26 @@ const Books = db.define('books', {
             notEmpty: true
         }
     },
+    id_category: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    name_category: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
     id_admin: {
         type: DataTypes.INTEGER,
         allowNull: false
     }
 }, {
-    freezeTableName: true
+    freezeTableName: true,
 })
 
 Admin.hasMany(Books, {foreignKey: 'id_admin'})
 Books.belongsTo(Admin, {foreignKey: 'id_admin'})
+
+Category.hasMany(Books, {foreignKey: 'id_category'})
+Books.belongsTo(Category, {foreignKey: 'id_category'})
 
 export default Books

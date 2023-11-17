@@ -1,4 +1,11 @@
-import { getDataAdminService, loginAdminService, logoutAdminService, registerAdminService, updateAdminService } from "../service/AdminService.js"
+import {
+    changeAdminPassword,
+    getDataAdminService, 
+    loginAdminService,
+    logoutAdminService, 
+    registerAdminService, 
+    updateAdminService 
+} from "../service/AdminService.js"
 
 
 export const registerAdminControllers = async (req, res, next) => {
@@ -48,6 +55,17 @@ export const updateDaminControllers = async (req, res, next) => {
         next(error)
     }
 }
+
+export const changeAdminPasswordControllers = async (req, res, next) => {
+    try {
+        await changeAdminPassword(req.body, req.adminId)
+
+        res.status(201).json({data: 'Ok'})
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 export const logoutAdminControllers = async (req, res, next) => {
     try {

@@ -15,7 +15,8 @@ const Admin = db.define('admin', {
         allowNull: false,
         validate: {
             notEmpty: true
-        }
+        },
+        unique: true
     },
     password: {
         type: DataTypes.STRING,
@@ -23,10 +24,6 @@ const Admin = db.define('admin', {
         validate: {
             notEmpty: true
         }
-    },
-    refreshToken: {
-        type: DataTypes.TEXT,
-        allowNull: true
     },
     role: {
         type: DataTypes.ENUM('admin'),
