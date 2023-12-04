@@ -3,10 +3,10 @@ import Admin from "../models/AdminModels.js"
 import { changeAdminPasswordValidate, loginAdminValidate, registerAdminValidate, updateAdminValidate } from "../validation/AdminValidation.js"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import fs from 'fs'
+import fs from 'fs/promises'
 
-const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH, 'utf-8')
-const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH, 'utf-8')
+const privateKey = await fs.readFile(process.env.PRIVATE_KEY_PATH, 'utf-8')
+const publicKey = await fs.readFile(process.env.PUBLIC_KEY_PATH, 'utf-8')
 
 export const registerAdminService = async (request) => {
     const result = await registerAdminValidate.validateAsync(request)

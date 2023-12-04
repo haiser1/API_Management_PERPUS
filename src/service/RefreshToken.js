@@ -1,11 +1,10 @@
 import { ResponseError } from "../error/ResponseError.js"
-import Admin from "../models/AdminModels.js"
 import jwt from 'jsonwebtoken'
-import fs from 'fs'
-import Users from "../models/UserModels.js"
+import fs from 'fs/promises'
 
-const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH, 'utf-8')
-const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH, 'utf-8')
+
+const publicKey = await fs.readFile(process.env.PUBLIC_KEY_PATH, 'utf-8')
+const privateKey = await fs.readFile(process.env.PRIVATE_KEY_PATH, 'utf-8')
 
 export const refreshTokenAdmin = async (token) => {
     if (!token){

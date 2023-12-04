@@ -1,10 +1,13 @@
-import fs from 'fs'
+import fs from 'fs/promises'
 import jwt from 'jsonwebtoken'
 
-const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH, 'utf-8')
+const publicKey = await fs.readFile(process.env.PUBLIC_KEY_PATH, 'utf-8')
 
 export const checkTokenUsers = async (req, res, next) => {
     const { authorization } = req.headers
+    const refreshToken = req.cookies.refreshTokenUser
+
+    if(!refreshToken) return res.status(401).json({message: 'Unauthorized'})
 
     if (!authorization) return res.status(401).json({message: 'Unauthorized'})
 
